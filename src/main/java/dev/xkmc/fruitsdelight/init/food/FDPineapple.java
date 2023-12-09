@@ -90,13 +90,13 @@ public enum FDPineapple implements PlantDataEntry<FDPineapple> {
 		pvd.getVariantBuilder(ctx.get()).forAllStates(state -> {
 			int age = state.getValue(PineappleBlock.AGE);
 			String tex = getName() + "_stage_" + age;
-			return ConfiguredModel.builder().modelFile(pvd.models().cross(tex, pvd.modLoc("block/" + tex)).renderType("cutout")).build();
+			return ConfiguredModel.builder().modelFile(pvd.models().cross(tex, pvd.modLoc("block/" + tex))).build();
 		});
 	}
 
 	private void buildWildModel(DataGenContext<Block, WildPineappleBlock> ctx, RegistrateBlockstateProvider pvd) {
 		String tex = getName() + "_wild";
-		pvd.simpleBlock(ctx.get(), pvd.models().cross(tex, pvd.modLoc("block/" + tex)).renderType("cutout"));
+		pvd.simpleBlock(ctx.get(), pvd.models().cross(tex, pvd.modLoc("block/" + tex)));
 	}
 
 	private void buildPlantLoot(RegistrateBlockLootTables pvd, PineappleBlock block) {
@@ -165,7 +165,7 @@ public enum FDPineapple implements PlantDataEntry<FDPineapple> {
 						PlacementUtils.filtered(Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(
 										BlockStateProvider.simple(getWildPlant())),
 								BlockPredicate.allOf(BlockPredicate.replaceable(),
-										BlockPredicate.matchesBlocks(Direction.DOWN.getNormal(), Blocks.SAND)))));
+										BlockPredicate.matchesBlock(Blocks.SAND, Direction.DOWN.getNormal())))));
 	}
 
 	@Override

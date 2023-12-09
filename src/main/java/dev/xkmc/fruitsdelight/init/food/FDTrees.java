@@ -1,5 +1,7 @@
 package dev.xkmc.fruitsdelight.init.food;
 
+import java.util.Random;
+
 import dev.xkmc.fruitsdelight.content.block.PassableLeavesBlock;
 import dev.xkmc.fruitsdelight.init.FruitsDelight;
 import dev.xkmc.fruitsdelight.init.data.PlantDataEntry;
@@ -18,7 +20,6 @@ import net.minecraft.data.worldgen.placement.VegetationPlacements;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.world.food.FoodProperties;
@@ -97,7 +98,7 @@ public enum FDTrees implements PlantDataEntry<FDTrees> {
 						))
 				.blockstate((ctx, pvd) -> pvd.simpleBlock(ctx.get(), pvd.models()
 						.cross(ctx.getName(), pvd.modLoc("block/" + ctx.getName()))
-						.renderType("cutout")))
+						))
 				.tag(BlockTags.SAPLINGS)
 				.item().model((ctx, pvd) -> pvd.generated(ctx, pvd.modLoc("block/" + ctx.getName())))
 				.tag(ItemTags.SAPLINGS).build()
@@ -176,7 +177,7 @@ public enum FDTrees implements PlantDataEntry<FDTrees> {
 									.modelFile(pvd.models().withExistingParent(name, "block/leaves")
 											.texture("all", "block/" + name)).build();
 						},
-						LeavesBlock.DISTANCE, LeavesBlock.PERSISTENT, LeavesBlock.WATERLOGGED);
+						LeavesBlock.DISTANCE, LeavesBlock.PERSISTENT);
 	}
 
 	private static void buildFruit(RegistrateBlockLootTables pvd, Block block, Block sapling, Item fruit) {
@@ -212,7 +213,7 @@ public enum FDTrees implements PlantDataEntry<FDTrees> {
 	private class TreeGrower extends AbstractTreeGrower {
 
 		@Override
-		protected Holder<? extends ConfiguredFeature<?, ?>> getConfiguredFeature(RandomSource rand, boolean large) {
+		protected Holder<? extends ConfiguredFeature<?, ?>> getConfiguredFeature(Random rand, boolean large) {
 			return treeCF;
 		}
 

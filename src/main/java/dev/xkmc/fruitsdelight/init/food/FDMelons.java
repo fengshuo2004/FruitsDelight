@@ -42,7 +42,7 @@ import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
 import net.minecraft.world.level.storage.loot.functions.LimitCount;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
-import net.minecraftforge.client.event.RegisterColorHandlersEvent;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import vectorwing.farmersdelight.common.tag.ForgeTags;
 import vectorwing.farmersdelight.data.builder.CuttingBoardRecipeBuilder;
@@ -130,7 +130,7 @@ public enum FDMelons implements PlantDataEntry<FDMelons> {
 						PlacementUtils.filtered(Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(
 										BlockStateProvider.simple(getMelonBlock())),
 								BlockPredicate.allOf(BlockPredicate.replaceable(),
-										BlockPredicate.matchesBlocks(Direction.DOWN.getNormal(), Blocks.SAND)))));
+										BlockPredicate.matchesBlock(Blocks.SAND, Direction.DOWN.getNormal())))));
 	}
 
 	@Override
@@ -177,7 +177,7 @@ public enum FDMelons implements PlantDataEntry<FDMelons> {
 			return ConfiguredModel.builder().modelFile(pvd.models()
 					.withExistingParent(ctx.getName() + "_stage" + age, "block/stem_growth" + age)
 					.texture("stem", pvd.modLoc("block/" + name + "_stem"))
-					.renderType("cutout")).build();
+					).build();
 		});
 	}
 
@@ -186,7 +186,7 @@ public enum FDMelons implements PlantDataEntry<FDMelons> {
 		pvd.horizontalBlock(ctx.get(), pvd.models().withExistingParent(ctx.getName(), "block/stem_fruit")
 				.texture("stem", pvd.modLoc("block/" + name + "_stem"))
 				.texture("upperstem", pvd.modLoc("block/" + name + "_attached"))
-				.renderType("cutout"), 270);
+				, 270);
 	}
 
 	private void buildMelonLoot(RegistrateBlockLootTables pvd, FDMelonBlock block) {
@@ -221,10 +221,10 @@ public enum FDMelons implements PlantDataEntry<FDMelons> {
 		return 14731036;
 	}
 
-	public static void registerColor(RegisterColorHandlersEvent.Block event) {
+	public static void registerColor(ColorHandlerEvent.Block event) {
 		for (FDMelons melon : FDMelons.values()) {
-			event.register(FDMelons::stemColor, melon.getStem());
-			event.register(FDMelons::attachedColor, melon.getAttachedStem());
+			event.getBlockColors().register(FDMelons::stemColor, melon.getStem());
+			event.getBlockColors().register(FDMelons::attachedColor, melon.getAttachedStem());
 		}
 	}
 

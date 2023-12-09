@@ -47,8 +47,7 @@ public class FDEffects {
 
 	public static final RegistryEntry<EffectRemovalEffect> BRIGHTENING = genEffect("brightening", () ->
 			new EffectRemovalEffect(MobEffectCategory.BENEFICIAL, FruitType.BLUEBERRY.color, List.of(
-					() -> MobEffects.BLINDNESS,
-					() -> MobEffects.DARKNESS
+					() -> MobEffects.BLINDNESS
 			)), "Make player immune to blindness and darkness");
 
 	public static final RegistryEntry<EffectRemovalEffect> RECOVERING = genEffect("recovering", () ->

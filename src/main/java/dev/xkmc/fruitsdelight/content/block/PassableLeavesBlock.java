@@ -1,9 +1,10 @@
 package dev.xkmc.fruitsdelight.content.block;
 
+import java.util.Random;
+
 import dev.xkmc.fruitsdelight.init.data.FDModConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -58,7 +59,7 @@ public class PassableLeavesBlock extends LeavesBlock {
 		builder.add(STATE);
 	}
 
-	private void dropFruit(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+	private void dropFruit(BlockState state, ServerLevel level, BlockPos pos, Random random) {
 		dropResources(state, level, pos);
 		State st = random.nextDouble() < FDModConfig.COMMON.flowerDecayChance.get() ? State.LEAVES : State.FLOWERS;
 		level.setBlockAndUpdate(pos, state.setValue(STATE, st));
@@ -69,8 +70,12 @@ public class PassableLeavesBlock extends LeavesBlock {
 		return state.getValue(STATE) != State.LEAVES || super.isRandomlyTicking(state);
 	}
 
+	protected boolean decaying(BlockState pState){
+		return isRandomlyTicking(pState);
+	}
+
 	@Override
-	public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+	public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
 		if (!decaying(state)) {
 			State st = state.getValue(STATE);
 			if (st == State.FLOWERS) {

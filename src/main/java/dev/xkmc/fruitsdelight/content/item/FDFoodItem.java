@@ -12,6 +12,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -50,15 +51,15 @@ public class FDFoodItem extends Item {
 	}
 
 	private static Component getTooltip(MobEffectInstance eff) {
-		MutableComponent ans = Component.translatable(eff.getDescriptionId());
+		MutableComponent ans = new TranslatableComponent(eff.getDescriptionId());
 		MobEffect mobeffect = eff.getEffect();
 		if (eff.getAmplifier() > 0) {
-			ans = Component.translatable("potion.withAmplifier", ans,
-					Component.translatable("potion.potency." + eff.getAmplifier()));
+			ans = new TranslatableComponent("potion.withAmplifier", ans,
+					new TranslatableComponent("potion.potency." + eff.getAmplifier()));
 		}
 
 		if (eff.getDuration() > 20) {
-			ans = Component.translatable("potion.withDuration", ans,
+			ans = new TranslatableComponent("potion.withDuration", ans,
 					MobEffectUtil.formatDuration(eff, 1));
 		}
 
@@ -92,7 +93,7 @@ public class FDFoodItem extends Item {
 
 	@Override
 	public ItemStack finishUsingItem(ItemStack stack, Level worldIn, LivingEntity consumer) {
-		ItemStack itemStack = getCraftingRemainingItem(stack);
+		ItemStack itemStack = getContainerItem(stack);
 		super.finishUsingItem(stack, worldIn, consumer);
 		if (itemStack.isEmpty()) {
 			return stack;
@@ -186,7 +187,7 @@ public class FDFoodItem extends Item {
 
 	@Override
 	public void fillItemCategory(CreativeModeTab pCategory, NonNullList<ItemStack> tab) {
-		if (this.allowedIn(pCategory) && food != null && food.overlay > 0) {
+		if (this.allowdedIn(pCategory) && food != null && food.overlay > 0) {
 			for (FruitType fruit : FruitType.values()) {
 				ItemStack stack = new ItemStack(this);
 				ListTag list = new ListTag();

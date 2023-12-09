@@ -72,7 +72,7 @@ public class FruitBushBlock extends BaseBushBlock {
 			level.playSound(null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + level.random.nextFloat() * 0.4F);
 			BlockState blockstate = state.setValue(AGE, 2);
 			level.setBlock(pos, blockstate, 2);
-			level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, blockstate));
+			level.gameEvent(GameEvent.BLOCK_CHANGE, pos);
 			return InteractionResult.sidedSuccess(level.isClientSide);
 		} else {
 			return super.use(state, level, pos, player, hand, result);

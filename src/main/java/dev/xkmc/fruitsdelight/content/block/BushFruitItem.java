@@ -31,7 +31,7 @@ public class BushFruitItem extends ItemNameBlockItem {
 	}
 
 	public void fillItemCategory(CreativeModeTab pCategory, NonNullList<ItemStack> pItems) {
-		if (this.allowedIn(pCategory)) {
+		if (this.allowdedIn(pCategory)) {
 			pItems.add(new ItemStack(this));
 		}
 	}

@@ -7,7 +7,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
+import net.minecraftforge.event.entity.living.PotionEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -17,17 +17,17 @@ public class EffectHandlers {
 
 	@SubscribeEvent
 	public static void onItemStartUse(LivingEntityUseItemEvent.Start event) {
-		var ins = event.getEntity().getEffect(FDEffects.LOZENGE.get());
+		var ins = event.getEntityLiving().getEffect(FDEffects.LOZENGE.get());
 		if (ins != null && isEatOrDrink(event.getItem())) {
 			event.setDuration(event.getDuration() >> (1 + ins.getAmplifier()));
 		}
 	}
 
 	@SubscribeEvent
-	public static void onEffectTest(MobEffectEvent.Applicable event) {
-		for (var old : event.getEntity().getActiveEffects()) {
+	public static void onEffectTest(PotionEvent.PotionApplicableEvent event) {
+		for (var old : event.getEntityLiving().getActiveEffects()) {
 			if (old.getEffect() instanceof EffectRemovalEffect eff) {
-				if (eff.set.get().contains(event.getEffectInstance().getEffect())) {
+				if (eff.set.get().contains(event.getPotionEffect().getEffect())) {
 					event.setResult(Event.Result.DENY);
 					return;
 				}

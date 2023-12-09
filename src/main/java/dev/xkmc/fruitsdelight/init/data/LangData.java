@@ -3,7 +3,7 @@ package dev.xkmc.fruitsdelight.init.data;
 import dev.xkmc.fruitsdelight.init.FruitsDelight;
 import dev.xkmc.l2library.repack.registrate.providers.RegistrateLangProvider;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.chat.MutableComponent;
 
 import javax.annotation.Nullable;
@@ -33,7 +33,7 @@ public enum LangData {
 	public MutableComponent get(Object... args) {
 		if (args.length != arg)
 			throw new IllegalArgumentException("for " + name() + ": expect " + arg + " parameters, got " + args.length);
-		MutableComponent ans = Component.translatable(key, args);
+		MutableComponent ans = new TranslatableComponent(key, args);
 		if (format != null) {
 			return ans.withStyle(format);
 		}
