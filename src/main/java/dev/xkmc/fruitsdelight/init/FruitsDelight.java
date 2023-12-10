@@ -32,6 +32,7 @@ public class FruitsDelight {
 		FDBushes.register();
 		FDMelons.register();
 		FDPineapple.register();
+		FDCrates.register();
 		FDBlocks.register();
 		FDItems.register();
 		FDEffects.register();
@@ -39,6 +40,7 @@ public class FruitsDelight {
 		FDMiscs.register();
 		FDModConfig.init();
 		REGISTRATE.addDataGenerator(ProviderType.BLOCK_TAGS, TagGen::onBlockTagGen);
+		REGISTRATE.addDataGenerator(ProviderType.ITEM_TAGS, TagGen::onItemTagGen);
 		REGISTRATE.addDataGenerator(ProviderType.RECIPE, RecipeGen::genRecipes);
 		REGISTRATE.addDataGenerator(ProviderType.LANG, LangData::genLang);
 	}
