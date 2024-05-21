@@ -4,13 +4,13 @@
   "experience": 0.1,
   "ingredients": [
     {
-      "item": "fruitsdelight:blueberry"
+      "tag": "forge:fruits/blueberry"
     },
     {
-      "item": "fruitsdelight:blueberry"
+      "tag": "forge:fruits/blueberry"
     },
     {
-      "item": "farmersdelight:wheat_dough"
+      "tag": "forge:dough/wheat"
     },
     {
       "tag": "forge:milk/milk_bottle"

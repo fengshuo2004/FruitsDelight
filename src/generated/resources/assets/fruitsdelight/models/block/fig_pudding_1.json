@@ -1,0 +1,8 @@
+{
+  "parent": "fruitsdelight:block/fig_pudding_base_1",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "bottom": "fruitsdelight:block/fig_pudding_bottom",
+    "top": "fruitsdelight:block/fig_pudding_top"
+  }
+}

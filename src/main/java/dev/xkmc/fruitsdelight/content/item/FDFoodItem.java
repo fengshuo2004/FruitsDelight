@@ -5,7 +5,7 @@ import dev.xkmc.fruitsdelight.init.data.TagGen;
 import dev.xkmc.fruitsdelight.init.food.FDFood;
 import dev.xkmc.fruitsdelight.init.food.FoodType;
 import dev.xkmc.fruitsdelight.init.food.FruitType;
-import dev.xkmc.l2library.util.code.Wrappers;
+import dev.xkmc.fruitsdelight.init.food.IFDFood;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.ListTag;
@@ -25,13 +25,14 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
+import vectorwing.farmersdelight.common.Configuration;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FDFoodItem extends Item {
+public class FDFoodItem extends Item implements IFDFoodItem{
 
 	public static final String ROOT = "JellyEffectRoot";
 
@@ -91,6 +92,14 @@ public class FDFoodItem extends Item {
 		return list.get(layer % list.size()).color;
 	}
 
+	public static ItemStack setContent(FDFoodItem item, FruitType e) {
+		var ans = item.getDefaultInstance();
+		ListTag list = new ListTag();
+		list.add(StringTag.valueOf(e.name()));
+		ans.getOrCreateTag().put(ROOT, list);
+		return ans;
+	}
+
 	@Override
 	public ItemStack finishUsingItem(ItemStack stack, Level worldIn, LivingEntity consumer) {
 		ItemStack itemStack = getContainerItem(stack);
@@ -124,7 +133,7 @@ public class FDFoodItem extends Item {
 			if (old.isMeat()) builder.meat();
 			if (food == null) return null;
 			Map<FruitType, Integer> map = new LinkedHashMap<>();
-			map.put(food.fruit, food.type.effectLevel);
+			map.put(food.fruit(), food.getType().effectLevel);
 			int lv = FoodType.JELLY.effectLevel;
 			for (var type : list) {
 				map.compute(type, (k, v) -> v == null ? lv : v + lv);
@@ -134,7 +143,7 @@ public class FDFoodItem extends Item {
 					builder.effect(() -> e.getEffect(ent.getValue()), e.getChance(ent.getValue()));
 				}
 			}
-			for (var e : food.effs) {
+			for (var e : food.getEffects()) {
 				builder.effect(e::getEffect, e.chance());
 			}
 			return builder.build();
@@ -143,17 +152,17 @@ public class FDFoodItem extends Item {
 	}
 
 	@Nullable
-	public final FDFood food;
+	public final IFDFood food;
 
 	private final UseAnim anim;
 
-	public FDFoodItem(Properties props, @Nullable FDFood food, UseAnim anim) {
+	public FDFoodItem(Properties props, @Nullable IFDFood food, UseAnim anim) {
 		super(props);
 		this.food = food;
 		this.anim = anim;
 	}
 
-	public FDFoodItem(Properties props, @Nullable FDFood food) {
+	public FDFoodItem(Properties props, @Nullable IFDFood food) {
 		this(props, food, UseAnim.EAT);
 	}
 
@@ -164,7 +173,7 @@ public class FDFoodItem extends Item {
 
 	@Override
 	public SoundEvent getDrinkingSound() {
-		if (food != null && food.type == FoodType.JELLY)
+		if (food != null && food.getType() == FoodType.JELLY)
 			return SoundEvents.HONEY_DRINK;
 		return SoundEvents.GENERIC_DRINK;
 	}
@@ -175,32 +184,34 @@ public class FDFoodItem extends Item {
 		if (!types.isEmpty()) {
 			list.add(LangData.JELLY_CONTENT.get());
 			for (var type : types) {
-				FDFood jelly = Wrappers.get(() -> FDFood.valueOf(type.name() + "_JELLY"));
-				if (jelly == null) continue;
-				list.add(jelly.item.get().getDescription().copy().withStyle(ChatFormatting.GRAY));
+				list.add(type.getJelly().getDescription().copy().withStyle(ChatFormatting.GRAY));
 			}
 		} else if (stack.is(TagGen.ALLOW_JELLY)) {
 			list.add(LangData.ALLOW_JELLY.get());
 		}
-		getFoodEffects(stack, list);
+		if (Configuration.FOOD_EFFECT_TOOLTIP.get())
+			getFoodEffects(stack, list);
 	}
 
 	@Override
 	public void fillItemCategory(CreativeModeTab pCategory, NonNullList<ItemStack> tab) {
-		if (this.allowdedIn(pCategory) && food != null && food.overlay > 0) {
+		if (this.allowdedIn(pCategory) && food instanceof FDFood fd && fd.overlay > 0) {
 			for (FruitType fruit : FruitType.values()) {
 				ItemStack stack = new ItemStack(this);
 				ListTag list = new ListTag();
-				for (int i = 0; i < food.overlay; i++) {
+				for (int i = 0; i < fd.overlay; i++) {
 					list.add(StringTag.valueOf(fruit.name()));
 				}
 				stack.getOrCreateTag().put(FDFoodItem.ROOT, list);
 				tab.add(stack);
 			}
-			tab.add(new ItemStack(this));
 		} else {
 			super.fillItemCategory(pCategory, tab);
 		}
 	}
 
+	@Override
+	public @Nullable IFDFood food() {
+		return food;
+	}
 }

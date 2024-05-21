@@ -2,10 +2,10 @@ package dev.xkmc.fruitsdelight.compat.sereneseasons;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import dev.xkmc.fruitsdelight.init.food.FDBushes;
-import dev.xkmc.fruitsdelight.init.food.FDMelons;
-import dev.xkmc.fruitsdelight.init.food.FDPineapple;
-import dev.xkmc.fruitsdelight.init.food.FDTrees;
+import dev.xkmc.fruitsdelight.init.plants.FDBushes;
+import dev.xkmc.fruitsdelight.init.plants.FDMelons;
+import dev.xkmc.fruitsdelight.init.plants.FDPineapple;
+import dev.xkmc.fruitsdelight.init.plants.FDTrees;
 import dev.xkmc.l2library.repack.registrate.providers.RegistrateItemTagsProvider;
 import dev.xkmc.l2library.repack.registrate.providers.RegistrateTagsProvider;
 import net.minecraft.world.level.block.Block;
@@ -14,9 +14,9 @@ public class SeasonCompat {
 
 	private static final Multimap<Seasons, FDTrees> TREE = new ImmutableMultimap.Builder<Seasons, FDTrees>()
 			.putAll(Seasons.SPRING, FDTrees.PEAR, FDTrees.PEACH)
-			.putAll(Seasons.SUMMER, FDTrees.LYCHEE, FDTrees.MANGO, FDTrees.MANGOSTEEN)
-			.putAll(Seasons.AUTUMN, FDTrees.ORANGE, FDTrees.APPLE)
-			.putAll(Seasons.WINTER, FDTrees.HAWBERRY, FDTrees.PERSIMMON)
+			.putAll(Seasons.SUMMER, FDTrees.LYCHEE, FDTrees.MANGO, FDTrees.MANGOSTEEN, FDTrees.BAYBERRY, FDTrees.DURIAN)
+			.putAll(Seasons.AUTUMN, FDTrees.ORANGE, FDTrees.APPLE, FDTrees.FIG)
+			.putAll(Seasons.WINTER, FDTrees.HAWBERRY, FDTrees.PERSIMMON, FDTrees.KIWI)
 			.build();
 
 	private static final Multimap<Seasons, FDBushes> BUSH = new ImmutableMultimap.Builder<Seasons, FDBushes>()

@@ -3,31 +3,43 @@ package dev.xkmc.fruitsdelight.content.block;
 import java.util.Random;
 
 import dev.xkmc.fruitsdelight.init.data.FDModConfig;
+import dev.xkmc.l2library.repack.registrate.providers.DataGenContext;
+import dev.xkmc.l2library.repack.registrate.providers.RegistrateBlockstateProvider;
+import dev.xkmc.l2library.repack.registrate.providers.loot.RegistrateBlockLootTables;
+import net.minecraft.advancements.critereon.EnchantmentPredicate;
+import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.EntityCollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.AlternativesEntry;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
+import net.minecraft.world.level.storage.loot.predicates.BonusLevelTableCondition;
+import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
+import net.minecraft.world.level.storage.loot.predicates.MatchTool;
+import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.common.ForgeHooks;
 
 import java.util.Locale;
 
-public class PassableLeavesBlock extends LeavesBlock {
+public class PassableLeavesBlock extends BaseLeavesBlock implements BonemealableBlock {
 
 	public enum State implements StringRepresentable {
 		LEAVES, FLOWERS, FRUITS;
@@ -45,7 +57,7 @@ public class PassableLeavesBlock extends LeavesBlock {
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
+	protected InteractionResult doClick(Level level, BlockPos pos, BlockState state) {
 		if (state.getValue(STATE) == State.FRUITS) {
 			if (level instanceof ServerLevel sl) {
 				dropFruit(state, sl, pos, level.getRandom());
@@ -61,15 +73,20 @@ public class PassableLeavesBlock extends LeavesBlock {
 		builder.add(STATE);
 	}
 
-	private void dropFruit(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+	protected void doDropFruit(BlockState state, ServerLevel level, BlockPos pos) {
 		dropResources(state, level, pos);
-		State st = random.nextDouble() < FDModConfig.COMMON.flowerDecayChance.get() ? State.LEAVES : State.FLOWERS;
-		level.setBlockAndUpdate(pos, state.setValue(STATE, st));
+	}
+
+	protected void dropFruit(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+		doDropFruit(state, level, pos);
+		level.setBlockAndUpdate(pos, state.setValue(STATE, State.LEAVES));
 	}
 
 	@Override
 	public boolean isRandomlyTicking(BlockState state) {
-		return state.getValue(STATE) != State.LEAVES || super.isRandomlyTicking(state);
+		if (state.getValue(PERSISTENT)) return false;
+		if (state.getValue(STATE) != State.LEAVES) return true;
+		return super.isRandomlyTicking(state);
 	}
 
 	protected boolean decaying(BlockState pState){
@@ -78,12 +95,18 @@ public class PassableLeavesBlock extends LeavesBlock {
 
 	@Override
 	public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
-		if (!decaying(state)) {
+		if (!state.getValue(PERSISTENT) && !decaying(state)) {
 			State st = state.getValue(STATE);
 			if (st == State.FLOWERS) {
 				boolean grow = random.nextDouble() < FDModConfig.COMMON.fruitsGrowChance.get();
 				if (ForgeHooks.onCropsGrowPre(level, pos, state, grow)) {
 					level.setBlockAndUpdate(pos, state.setValue(STATE, State.FRUITS));
+					var next = findNextFlowerTarget(level, pos,
+							e -> !e.getValue(PERSISTENT) && e.getValue(STATE) == State.LEAVES);
+					if (next != null) {
+						var ns = level.getBlockState(next);
+						level.setBlockAndUpdate(next, ns.setValue(STATE, State.FLOWERS));
+					}
 					ForgeHooks.onCropsGrowPost(level, pos, state);
 					return;
 				}
@@ -98,13 +121,57 @@ public class PassableLeavesBlock extends LeavesBlock {
 		super.randomTick(state, level, pos, random);
 	}
 
-	@Deprecated
 	@Override
-	public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
-		if (ctx instanceof EntityCollisionContext ectx && ectx.getEntity() instanceof ItemEntity) {
-			return Shapes.empty();
-		}
-		return super.getCollisionShape(state, level, pos, ctx);
+	public BlockState flowerState() {
+		return defaultBlockState().setValue(PassableLeavesBlock.STATE, PassableLeavesBlock.State.FLOWERS);
+	}
+
+	@Override
+	public boolean isValidBonemealTarget(BlockGetter level, BlockPos pos, BlockState state, boolean client) {
+		return state.getValue(PERSISTENT) || state.getValue(STATE) == State.FLOWERS;
+	}
+
+	@Override
+	public boolean isBonemealSuccess(Level level, RandomSource r, BlockPos pos, BlockState state) {
+		return true;
+	}
+
+	@Override
+	public void performBonemeal(ServerLevel level, RandomSource r, BlockPos pos, BlockState state) {
+		level.setBlockAndUpdate(pos, state.cycle(STATE));
+	}
+
+	protected ConfiguredModel[] buildModel(RegistrateBlockstateProvider pvd, String treeName, BlockState state) {
+		String name = treeName + "_" +
+				state.getValue(PassableLeavesBlock.STATE).getSerializedName();
+		return ConfiguredModel.builder()
+				.modelFile(pvd.models().withExistingParent(name, "block/leaves")
+						.texture("all", "block/" + name)).build();
+	}
+
+	public void buildLeavesModel(DataGenContext<Block, ? extends BaseLeavesBlock> ctx, RegistrateBlockstateProvider pvd, String name) {
+		pvd.getVariantBuilder(ctx.get())
+				.forAllStatesExcept(state -> buildModel(pvd, name, state),
+						LeavesBlock.DISTANCE, LeavesBlock.PERSISTENT, LeavesBlock.WATERLOGGED);
+	}
+
+	public void buildLoot(RegistrateBlockLootTables pvd, Block block, Block sapling, Item fruit) {
+		var leaves = LootItem.lootTableItem(block)
+				.when(MatchTool.toolMatches(ItemPredicate.Builder.item()
+						.hasEnchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH,
+								MinMaxBounds.Ints.atLeast(1)))));
+		var fruits = LootItem.lootTableItem(fruit)
+				.when(LootItemBlockStatePropertyCondition
+						.hasBlockStateProperties(block)
+						.setProperties(StatePropertiesPredicate.Builder.properties()
+								.hasProperty(PassableLeavesBlock.STATE, PassableLeavesBlock.State.FRUITS)))
+				.apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 1));
+		var saplings = LootItem.lootTableItem(sapling)
+				.when(BonusLevelTableCondition.bonusLevelFlatChance(Enchantments.BLOCK_FORTUNE,
+						1 / 20f, 1 / 16f, 1 / 12f, 1 / 10f));
+		var drops = AlternativesEntry.alternatives(leaves, fruits, saplings);
+		pvd.add(block, LootTable.lootTable().withPool(LootPool.lootPool().add(drops)
+				.when(ExplosionCondition.survivesExplosion())));
 	}
 
 }

@@ -1,7 +1,10 @@
 package dev.xkmc.fruitsdelight.init.data;
 
+import dev.xkmc.fruitsdelight.compat.diet.DietTagGen;
 import dev.xkmc.fruitsdelight.compat.sereneseasons.SeasonCompat;
 import dev.xkmc.fruitsdelight.init.FruitsDelight;
+import dev.xkmc.fruitsdelight.init.food.FDFood;
+import dev.xkmc.fruitsdelight.init.plants.FDBushes;
 import dev.xkmc.l2library.repack.registrate.providers.RegistrateItemTagsProvider;
 import dev.xkmc.l2library.repack.registrate.providers.RegistrateTagsProvider;
 import net.minecraft.resources.ResourceLocation;
@@ -22,6 +25,8 @@ public class TagGen {
 	public static final TagKey<Item> JUICE = ItemTags.create(new ResourceLocation(FruitsDelight.MODID, "juice"));
 	public static final TagKey<Item> ALLOW_JELLY = ItemTags.create(new ResourceLocation(FruitsDelight.MODID, "allow_jelly"));
 
+	public static final TagKey<Item> JELLO = ItemTags.create(new ResourceLocation(FruitsDelight.MODID, "jello"));
+
 	public static void onBlockTagGen(RegistrateTagsProvider<Block> pvd) {
 		pvd.tag(PINEAPPLE_GROW).add(Blocks.SAND, Blocks.RED_SAND, Blocks.COARSE_DIRT);
 		if (ModList.get().isLoaded(SereneSeasons.MOD_ID)) {
@@ -30,9 +35,13 @@ public class TagGen {
 	}
 
 	public static void onItemTagGen(RegistrateItemTagsProvider pvd) {
+		pvd.tag(ItemTags.create(new ResourceLocation("forge", "berries")))
+				.add(FDBushes.BLUEBERRY.getFruit(), FDBushes.CRANBERRY.getFruit());
 		if (ModList.get().isLoaded(SereneSeasons.MOD_ID)) {
 			SeasonCompat.genItem(pvd);
 		}
+		pvd.tag(DietTagGen.GRAINS.tag).add(FDFood.MANGOSTEEN_CAKE.item.get());
+		pvd.tag(DietTagGen.SUGARS.tag).add(FDFood.PEAR_WITH_ROCK_SUGAR.get());
 	}
 
 }

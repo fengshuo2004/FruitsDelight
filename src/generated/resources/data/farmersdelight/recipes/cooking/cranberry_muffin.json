@@ -4,13 +4,13 @@
   "experience": 0.1,
   "ingredients": [
     {
-      "item": "fruitsdelight:cranberry"
+      "tag": "forge:fruits/cranberry"
     },
     {
-      "item": "fruitsdelight:cranberry"
+      "tag": "forge:fruits/cranberry"
     },
     {
-      "item": "farmersdelight:wheat_dough"
+      "tag": "forge:dough/wheat"
     },
     {
       "tag": "forge:milk/milk_bottle"

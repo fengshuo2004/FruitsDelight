@@ -5,11 +5,18 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "fruitsdelight.refmap.json",
   "mixins": [
+	"AbstractArrowMixin",
+	"AbstractCauldronBlockAccessor",
+	"AnimalMixin",
+	"BlockStateBaseMixin",
 	"BoatMixin",
+	"FoodDataMixin",
+	"HoneyBlockMixin",
 	"LivingEntityMixin",
 	"PlayerMixin"
   ],
   "client": [
+	"BrushableBlockMixin"
   ],
   "injectors": {
 	"defaultRequire": 1

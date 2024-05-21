@@ -7,16 +7,16 @@
   "experience": 0.1,
   "ingredients": [
     {
-      "item": "fruitsdelight:peach"
-    },
-    {
-      "item": "fruitsdelight:peach"
-    },
-    {
       "item": "minecraft:sugar"
     },
     {
       "item": "minecraft:ice"
+    },
+    {
+      "tag": "forge:fruits/peach"
+    },
+    {
+      "tag": "forge:fruits/peach"
     }
   ],
   "result": {

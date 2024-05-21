@@ -1,5 +1,6 @@
 {
   "values": [
+    "fruitsdelight:durian",
     "fruitsdelight:blueberry_bush",
     "fruitsdelight:lemon_tree",
     "fruitsdelight:hamimelon",
@@ -13,9 +14,13 @@
     "fruitsdelight:peach_crate",
     "fruitsdelight:orange_crate",
     "fruitsdelight:mangosteen_crate",
+    "fruitsdelight:bayberry_crate",
+    "fruitsdelight:kiwi_crate",
+    "fruitsdelight:fig_crate",
     "fruitsdelight:blueberry_crate",
     "fruitsdelight:lemon_crate",
     "fruitsdelight:cranberry_crate",
-    "fruitsdelight:pineapple_crate"
+    "fruitsdelight:pineapple_crate",
+    "fruitsdelight:apple_crate"
   ]
 }
